@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Handmade Select — ミニマルハンドメイドEC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="left">
+      <div class="logo" id="logo">Handmade Select</div>
+      <select id="lang-select" aria-label="言語切替">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+      </select>
+      <select id="theme-select" aria-label="テーマ切替">
+        <option value="natural">Natural</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+
+    <div class="center">
+      <input id="search" type="search" placeholder="商品を検索..." />
+    </div>
+
+    <div class="right">
+      <button id="login-btn" class="btn small">ログイン</button>
+      <button id="account-btn" class="btn small hidden">マイページ</button>
+      <button id="cart-btn" class="btn small">カート (<span id="cart-count">0</span>)</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 id="hero-title">暮らしを彩るハンドメイド作品</h1>
+      <p id="hero-sub">アクセサリー・雑貨・インテリアを厳選してお届け</p>
+    </section>
+
+    <section class="products">
+      <div class="products-header">
+        <h2 id="products-title">商品一覧</h2>
+        <div class="filters">
+          <select id="sort">
+            <option value="default">並び替え</option>
+            <option value="price-asc">価格が安い</option>
+            <option value="price-desc">価格が高い</option>
+            <option value="new">新着</option>
+          </select>
+        </div>
+      </div>
+      <div id="product-grid" class="grid"></div>
+    </section>
+
+    <!-- カートサイド -->
+    <aside id="cart-panel" class="panel hidden">
+      <h3 id="cart-title">カート</h3>
+      <ul id="cart-list" class="cart-list"></ul>
+
+      <div class="coupon-area">
+        <input id="coupon-input" placeholder="クーポンコードを入力" />
+        <button id="apply-coupon" class="btn">適用</button>
+        <p id="coupon-msg" class="muted"></p>
+      </div>
+
+      <p class="summary">小計: <span id="subtotal">0</span>円</p>
+      <p class="summary">割引: <span id="discount">0</span>円</p>
+      <p class="summary total">合計: <strong id="total">0</strong>円</p>
+
+      <button id="checkout-btn" class="btn primary">購入手続きへ</button>
+      <button id="close-cart" class="btn ghost">閉じる</button>
+    </aside>
+
+    <!-- モーダル：商品詳細 -->
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-inner">
+        <button class="modal-close btn ghost" id="modal-close">&times;</button>
+        <img id="modal-img" src="" alt="" />
+        <h3 id="modal-title"></h3>
+        <p id="modal-price"></p>
+        <p id="modal-desc"></p>
+
+        <div id="review-section">
+          <h4>レビュー</h4>
+          <ul id="review-list"></ul>
+          <div id="review-form">
+            <input id="review-name" placeholder="お名前" />
+            <textarea id="review-text" placeholder="レビューを書く"></textarea>
+            <button id="post-review" class="btn">投稿</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <label>数量
+            <input type="number" id="modal-qty" value="1" min="1" />
+          </label>
+          <button id="add-cart-btn" class="btn primary">カートに追加</button>
+          <button id="share-btn" class="btn">共有</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ログイン/サインアップモーダル -->
+    <div id="auth-modal" class="modal hidden">
+      <div class="modal-inner small">
+        <button class="modal-close btn ghost" id="auth-close">&times;</button>
+        <h3 id="auth-title">ログイン</h3>
+        <input id="auth-email" placeholder="メール" />
+        <input id="auth-pass" type="password" placeholder="パスワード" />
+        <div class="auth-actions">
+          <button id="auth-login" class="btn primary">ログイン</button>
+          <button id="auth-signup" class="btn">新規登録</button>
+        </div>
+        <p id="auth-msg" class="muted"></p>
+      </div>
+    </div>
+
+    <!-- チェックアウト画面 -->
+    <div id="checkout-modal" class="modal hidden">
+      <div class="modal-inner">
+        <button class="modal-close btn ghost" id="checkout-close">&times;</button>
+        <h3 id="checkout-title">購入手続き</h3>
+
+        <div id="checkout-steps">
+          <div class="step" id="step-info">
+            <h4>配送情報</h4>
+            <input id="ship-name" placeholder="お名前" />
+            <input id="ship-address" placeholder="住所（都道府県 市区町村）" />
+            <input id="ship-zip" placeholder="郵便番号" />
+            <button id="to-payment" class="btn">次へ</button>
+          </div>
+
+          <div class="step hidden" id="step-payment">
+            <h4>お支払い（擬似）</h4>
+            <input id="card-name" placeholder="カード名義" />
+            <input id="card-num" placeholder="カード番号（例: 4242 4242 4242 4242）" />
+            <input id="card-exp" placeholder="有効期限 MM/YY" />
+            <input id="card-cvc" placeholder="CVC" />
+            <button id="pay-btn" class="btn primary">購入する</button>
+          </div>
+
+          <div class="step hidden" id="step-done">
+            <h4>ご注文完了</h4>
+            <p id="order-msg">注文ありがとうございます。注文番号：<span id="order-id"></span></p>
+            <button id="done-close" class="btn">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 会員ページ（単一ページ内切替） -->
+    <section id="account-page" class="account hidden">
+      <h2>マイページ</h2>
+      <div id="account-info">
+        <p>メール: <span id="account-email"></span></p>
+        <p>登録日: <span id="account-created"></span></p>
+        <button id="logout-btn" class="btn">ログアウト</button>
+      </div>
+
+      <h3>注文履歴</h3>
+      <ul id="order-history"></ul>
+    </section>
+  </main>
+
+  <audio id="click-snd" src="sounds/click.mp3" preload="auto"></audio>
+  <audio id="success-snd" src="sounds/success.mp3" preload="auto"></audio>
+
+  <footer>
+    <p>© 2025 Handmade Select</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
